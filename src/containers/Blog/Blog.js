@@ -2,10 +2,19 @@ import React, { Component } from 'react';
 import axios from '../../axios';
 import './Blog.css';
 import Posts from './Posts/Posts';
-import NewPost from './NewPost/NewPost';
-import { Route, NavLink, Switch } from 'react-router-dom';
+import { Route, NavLink, Switch, Redirect } from 'react-router-dom';
+//import NewPost from './NewPost/NewPost';
+import asyncComponent from '../../hoc/asyncComponent';
+
+const AsyncNewPost = asyncComponent(() => {
+    return import('./NewPost/NewPost'); //204: loading routes lazily 
+});
 
 class Blog extends Component {
+    state = {
+        auth: true
+    }
+
     render() {
         return (
             <div className="Blog">
@@ -32,8 +41,11 @@ class Blog extends Component {
                 {/* <Route path="/" exact render={() => <h1>Home</h1>}/>
                 <Route path="/" render={() => <h1>Home 2</h1>}/> */}
                 <Switch>              
-                    <Route path="/new-post" exact component={NewPost} />
+                    {this.state.auth ? <Route path="/new-post" exact component={AsyncNewPost} /> : null} 
                     <Route path="/posts" component={Posts} />
+                    <Route render={() => <h1>Not found</h1>}/>
+                    {/* <Route path="/" component={Posts} /> */}
+                    {/* <Redirect from="/" to="/posts" />  */}
                 </Switch>
             </div>
         );

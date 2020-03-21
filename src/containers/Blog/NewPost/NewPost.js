@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 import './NewPost.css';
 
@@ -7,11 +8,13 @@ class NewPost extends Component {
     state = {
         title: '',
         content: '',
-        author: 'Max'
+        author: 'Max',
+        submitted: false
     }
 
-    componentDidMount(){
-        console.log(this.props); 
+    componentDidMount() {
+        // If unauth => this.props.history.replace('/posts');
+        console.log(this.props);
     }
 
     postDataHandler = () => {
@@ -22,14 +25,23 @@ class NewPost extends Component {
         }
         // note: axios will automatically stringify post to json data 
         axios.post('/posts', data)
-        .then( response => {
-            console.log(response);
-        });
+            .then(response => {
+                console.log(response);
+                //this.setState({ submitted: true });
+                this.props.history.push('/posts'); // other way: using history prop : if press back: return to new-post
+                // this.props.history.replace('/posts'); // if press back: return to posts 
+            });
     }
 
     render() {
+        let redirect = null;
+        if (this.state.submitted) {
+            redirect = <Redirect to="/posts" />;
+        }
+
         return (
             <div className="NewPost">
+                {redirect}
                 <h1>Add a Post</h1>
                 <label>Title</label>
                 <input type="text" value={this.state.title} onChange={(event) => this.setState({ title: event.target.value })} />
